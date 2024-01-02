@@ -99,7 +99,7 @@ El runner de Apache Flink se puede utilizar para ejecutar data pipelines de Beam
 
 1. A partir de Beam 2.18.0, imágenes de Docker preconstruidas del servicio Flink están disponibles en Docker Hub: `Flink 1.10, Flink 1.11, Flink 1.12, Flink 1.13, Flink 1.14.2.`
 2. Inicializa el endpoint JobService: `docker run --net=host apache/beam_flink1.10_job_server:latest3`
-3. Envía el pipeline al endpoint de arriba utilizando el PortableRunner, job_endpoint configurado para localhost:8099 (esta es la dirección por defecto del JobService). Opcionalmente setea el environment_type a LOOPBACK. Por ejemplo:
+3. Envía el pipeline al endpoint de arriba utilizando el PortableRunner, configurando el job_endpoint para localhost:8099 (esta es la dirección por defecto del JobService). Opcionalmente setea el environment_type a LOOPBACK. Ejemplo:
    
 ```
 import apache_beam as beam
@@ -112,6 +112,44 @@ options = PipelineOptions([
 ])
 with beam.Pipeline(options) as p:
     ...
+```
+
+###### Apache Spark runner
+
+El runner de Apache Spark se puede utilizar para ejecutar data pipelines de Beam usando Apache Spark. El runner de Spark puede ejecutar pipelines de Spark como una aplicación nativa de Spark; desplegando una aplicación autónoma para modo local, corriendo en Spark Standalone, o utilizando YARN o Mesos. El runner de Spark ejecuta pipelines de Beam en Apache Spark, proporcionando:
+
+- Pipelines por lotes y streaming (y combinados).
+- Las mismas garantías de tolerancia a fallos que ofrecen los RDD y DStreams.
+- Las mismas características de seguridad que proporciona Spark.
+- Informes de métricas integradas utilizando el sistema de métricas de Spark, que también informa sobre Beam Aggregators.
+- Soporte nativo para side-inputs de Beam a través de las variables Broadcast de Spark.
+
+**Ejemplo**
+
+1. Inicializa el endpoint JobService:
+   - con Docker (de preferencia): `docker run --net=host apache/beam_spark_job_server:latest`
+   - o del código fuente de Beam: `./gradlew :runners:spark:3:job-server:runShadow`
+3. Ejecuta el pipeline en el endpoint de arriba utilizando el PortableRunner, configurando el job_endpoint para localhost:8099 (esta es la dirección por defecto del JobService), y el environment_type seteado en LOOPBACK. Ejemplo:
+  
+```
+import apache_beam as beam
+from apache_beam.options.pipeline_options import PipelineOptions
+
+options = PipelineOptions([
+    "--runner=PortableRunner",
+    "--job_endpoint=localhost:8099",
+    "--environment_type=LOOPBACK"
+])
+with beam.Pipeline(options) as p:
+    ...
+```
+
+Consola:
+
+```
+python -m apache_beam.examples.wordcount --input /path/to/inputfile \
+                                         --output /path/to/write/counts \
+                                         --runner SparkRunner
 ```
     
 #### Common Transforms
