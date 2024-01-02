@@ -168,7 +168,77 @@ python -m apache_beam.examples.wordcount --input /path/to/inputfile \
 
 #### Cross-Language Transforms
 
-#### Ejemplos
+### [How Beam executes a pipeline](https://beam.apache.org/documentation/runtime/model)
+
+### Pipeline development lifecycle
+
+### Common pipeline patterns
+
+lorem ipsum
+
+### AI/ML pipelines
+
+lorem ipsum
+
+### Runtime systems
+
+lorem ipsum
+
+#### Container environments
+
+lorem ipsum
+
+#### Resource hints
+
+lorem ipsum
+
+#### SDK Harness Configuration
+
+lorem ipsum
+
+### [Beam SQL overview](https://beam.apache.org/documentation/dsls/sql/overview/)
+
+#### Walkthrough
+
+lorem ipsum
+
+#### Shell
+
+lorem ipsum
+
+#### Apache Calcite dialect
+
+lorem ipsum
+
+#### ZetaSQL dialect
+
+lorem ipsum
+
+#### Beam SQL extensions
+
+lorem ipsum
+
+### Beam DataFrames overview
+
+lorem ipsum
+
+#### What is a DataFrame?
+
+lorem ipsum
+
+#### Pre-requisites
+
+lorem ipsum
+
+#### Using DataFrames
+
+lorem ipsum
+
+#### Embedding DataFrames in a pipeline
+
+lorem ipsum
+
+### Ejemplos
 
 ### Ejercicios
 
