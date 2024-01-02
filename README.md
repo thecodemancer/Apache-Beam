@@ -1,4 +1,4 @@
-# Apache-Beam
+# Apache Beam
 
 <img src="https://res.cloudinary.com/dxnufruex/image/upload/v1669761065/macrometa-web/images/6172fb248a6212d910d87b73_uLzn5MjM55jF0rj3YNgfPwakSo6-Vbng98ywy7mykWutqOhXP20PJsRfzFJlVg986fFWAjyzTErvoY5g32Vu60ui7Qgea2Qe1ReS3nlZt7czefTQ4QWLnpX1wDqYQznrffSW__08_s1600.png" />
 
@@ -39,13 +39,45 @@ Se contará con sesiones semanales, cada una de una hora de duración. Nos centr
 
 #### Conceptos
 
+##### Pipeline Overview
+
+To use Beam, you first need to first create a driver program using the classes in one of the Beam SDKs. Your driver program defines your pipeline, including all of the inputs, transforms, and outputs. It also sets execution options for your pipeline (typically passed by using command-line options). These include the Pipeline Runner, which, in turn, determines what back-end your pipeline will run on.
+
+The Beam SDKs provide several abstractions that simplify the mechanics of large-scale distributed data processing. The same Beam abstractions work with both batch and streaming data sources. When you create your Beam pipeline, you can think about your data processing task in terms of these abstractions. They include:
+
+###### Pipeline: 
+
+A Pipeline encapsulates your entire data processing task, from start to finish. This includes reading input data, transforming that data, and writing output data. All Beam driver programs must create a Pipeline. When you create the Pipeline, you must also specify the execution options that tell the Pipeline where and how to run.
+
+###### PCollection: 
+
+A PCollection represents a distributed data set that your Beam pipeline operates on. The data set can be bounded, meaning it comes from a fixed source like a file, or unbounded, meaning it comes from a continuously updating source via a subscription or other mechanism. Your pipeline typically creates an initial PCollection by reading data from an external data source, but you can also create a PCollection from in-memory data within your driver program. From there, PCollections are the inputs and outputs for each step in your pipeline.
+
+###### PTransform: 
+
+A PTransform represents a data processing operation, or a step, in your pipeline. Every PTransform takes one or more PCollection objects as the input, performs a processing function that you provide on the elements of that PCollection, and then produces zero or more output PCollection objects.
+
+###### I/O transforms: 
+
+Beam comes with a number of “IOs” - library PTransforms that read or write data to various external storage systems. 
+
+A typical Beam driver program works as follows:
+
+- Create a Pipeline object and set the pipeline execution options, including the Pipeline Runner.
+- Create an initial PCollection for pipeline data, either using the IOs to read data from an external storage system, or using a Create transform to build a PCollection from in-memory data.
+- Apply PTransforms to each PCollection. Transforms can change, filter, group, analyze, or otherwise process the elements in a PCollection. A transform creates a new output PCollection without modifying the input collection. A typical pipeline applies subsequent transforms to each new output PCollection in turn until the processing is complete. However, note that a pipeline does not have to be a single straight line of transforms applied one after another: think of PCollections as variables and PTransforms as functions applied to these variables: the shape of the pipeline can be an arbitrarily complex processing graph.
+- Use IOs to write the final, transformed PCollection(s) to an external source.
+- Run the pipeline using the designated Pipeline Runner.
+
+When you run your Beam driver program, the Pipeline Runner that you designate constructs a workflow graph of your pipeline based on the PCollection objects you’ve created and the transforms that you’ve applied. That graph is then executed using the appropriate distributed processing back-end, becoming an asynchronous “job” (or equivalent) on that back-end.
+
 ##### Runners
 
-###### Overview
+##### Overview
 
 Apache Beam proporciona una capa API portátil para crear sofisticados data pipelines de datos en paralelo que pueden ejecutarse en una diversidad de motores de ejecución o ejecutores. Los conceptos centrales de esta capa se basan en el modelo Beam (anteriormente denominado modelo Dataflow) y se implementan en distintos grados en cada runner de Beam.
 
-###### Direct runner
+##### Direct runner
 
 Direct Runner ejecuta data pipelines en tu máquina y está diseñado para validar que los data pipelines se adhieran al modelo Apache Beam lo más fielmente posible. En lugar de centrarse en la ejecución eficiente del data pipeline, Direct Runner realiza comprobaciones adicionales para garantizar que los usuarios no dependan de una semántica que no esté garantizada por el modelo. Algunas de estas comprobaciones incluyen: 
 
@@ -62,7 +94,7 @@ El uso de Direct Runner para pruebas y desarrollo ayuda a garantizar que los dat
 python -m apache_beam.examples.wordcount --input YOUR_INPUT_FILE --output counts
 ```
 
-###### Google Cloud Dataflow runner
+##### Google Cloud Dataflow runner
 
 Este runner utiliza los servicios administrados de Cloud Dataflow. cuando corres tu data pipeline con el servicio de Cloud Dataflow, el runner sube tu código ejecutable y las dependencias a un bucket de Google Cloud Storage  y crea un job de Cloud Dataflow, el cual ejecuta tu pipeline con recursos administrados en Google Cloud Platform. El runner y el servicio de Cloud Dataflow son adecuados para jobs continuos a gran escala y proporcionan:
 
@@ -84,7 +116,7 @@ python -m apache_beam.examples.wordcount --input gs://dataflow-samples/shakespea
                                          --temp_location gs://YOUR_GCS_BUCKET/tmp/
 ```
 
-###### Apache Flink runner
+##### Apache Flink runner
 
 El runner de Apache Flink se puede utilizar para ejecutar data pipelines de Beam utilizando Apache Flink. Para la ejecución, puedes elegir entre un modo de ejecución en clúster (por ejemplo, Yarn/Kubernetes/Mesos) o un modo de ejecución integrado local que es útil para hacer pruebas. El runner de Flink y Apache Flink son adecuados para job continuos a gran escala y proporcionan:
 
@@ -114,7 +146,7 @@ with beam.Pipeline(options) as p:
     ...
 ```
 
-###### Apache Spark runner
+##### Apache Spark runner
 
 El runner de Apache Spark se puede utilizar para ejecutar data pipelines de Beam usando Apache Spark. El runner de Spark puede ejecutar pipelines de Spark como una aplicación nativa de Spark; desplegando una aplicación autónoma para modo local, corriendo en Spark Standalone, o utilizando YARN o Mesos. El runner de Spark ejecuta pipelines de Beam en Apache Spark, proporcionando:
 
