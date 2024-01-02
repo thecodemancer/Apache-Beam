@@ -27,10 +27,7 @@ Se contará con sesiones semanales, cada una de una hora de duración. Nos centr
 
 ## Contenido
 
-
-### Beginners
-
-#### Quickstarts
+### Quickstarts
 
 - [Java Quickstart](https://beam.apache.org/get-started/quickstart-java/) - How to set up and run a WordCount pipeline on the Java SDK.
 - [Python Quickstart](https://beam.apache.org/get-started/quickstart-py/) - How to set up and run a WordCount pipeline on the Python SDK.
@@ -38,7 +35,7 @@ Se contará con sesiones semanales, cada una de una hora de duración. Nos centr
 - [Java Development Environment](https://medium.com/google-cloud/setting-up-a-java-development-environment-for-apache-beam-on-google-cloud-platform-ec0c6c9fbb39) - Setting up a Java development environment for Apache Beam using IntelliJ and Maven.
 - [Python Development Environment](https://medium.com/google-cloud/python-development-environments-for-apache-beam-on-google-cloud-platform-b6f276b344df) - Setting up a Python development environment for Apache Beam using PyCharm.
 
-#### Introduction
+### Introduction
 
 #### Conceptos
 
@@ -67,12 +64,56 @@ python -m apache_beam.examples.wordcount --input YOUR_INPUT_FILE --output counts
 
 ###### Google Cloud Dataflow runner
 
-Este runner utiliza los servicios administrados de Cloud Dataflow. cuando corres tu data pipeline con el servicio de Cloud Dataflow, el runner sube tu código ejecutable y las dependencias a un bucket de Google Cloud Storage  y crea un job de Cloud Dataflow, el cual ejecuta tu pipeline con recursos administrados en Google Cloud Platform. El runner y el servicio de Cloud Dataflow son adecuados para jobs continuos a gran escala y proveen:
+Este runner utiliza los servicios administrados de Cloud Dataflow. cuando corres tu data pipeline con el servicio de Cloud Dataflow, el runner sube tu código ejecutable y las dependencias a un bucket de Google Cloud Storage  y crea un job de Cloud Dataflow, el cual ejecuta tu pipeline con recursos administrados en Google Cloud Platform. El runner y el servicio de Cloud Dataflow son adecuados para jobs continuos a gran escala y proporcionan:
 
 - un servicio totalmente administrado
 - autoescalado del número de workers a través del tiempo de vida del job
 - Rebalanceo dinámico de carga
 
+**Ejemplo**
+
+```
+# Como parte de la configuración inicial, se instalan los componentes específicos extra de Google Cloud Platform.
+
+pip install apache-beam[gcp]
+python -m apache_beam.examples.wordcount --input gs://dataflow-samples/shakespeare/kinglear.txt \
+                                         --output gs://YOUR_GCS_BUCKET/counts \
+                                         --runner DataflowRunner \
+                                         --project YOUR_GCP_PROJECT \
+                                         --region YOUR_GCP_REGION \
+                                         --temp_location gs://YOUR_GCS_BUCKET/tmp/
+```
+
+###### Apache Flink runner
+
+El runner de Apache Flink se puede utilizar para ejecutar data pipelines de Beam utilizando Apache Flink. Para la ejecución, puedes elegir entre un modo de ejecución en clúster (por ejemplo, Yarn/Kubernetes/Mesos) o un modo de ejecución integrado local que es útil para hacer pruebas. El runner de Flink y Apache Flink son adecuados para job continuos a gran escala y proporcionan:
+
+- Un runtime centrado en streaming que admite programas de procesamiento por lotes y en streaming de datos
+- Un runtime que admite un rendimiento muy alto y una baja latencia de eventos al mismo tiempo
+- Tolerancia a fallos con garantías de procesamiento exactamente una vez
+- Contrapresión natural en programas de streaming.
+- Gestión de memoria personalizada para una conmutación eficiente y sólida entre algoritmos de procesamiento de datos en memoria y fuera del núcleo
+- Integración con YARN y otros componentes del ecosistema Apache Hadoop
+
+**Ejemplo**
+
+1. A partir de Beam 2.18.0, imágenes de Docker preconstruidas del servicio Flink están disponibles en Docker Hub: `Flink 1.10, Flink 1.11, Flink 1.12, Flink 1.13, Flink 1.14.2.`
+2. Inicializa el endpoint JobService: `docker run --net=host apache/beam_flink1.10_job_server:latest3`
+3. Envía el pipeline al endpoint de arriba utilizando el PortableRunner, job_endpoint configurado para localhost:8099 (esta es la dirección por defecto del JobService). Opcionalmente setea el environment_type a LOOPBACK. Por ejemplo:
+   
+```
+import apache_beam as beam
+from apache_beam.options.pipeline_options import PipelineOptions
+
+options = PipelineOptions([
+    "--runner=PortableRunner",
+    "--job_endpoint=localhost:8099",
+    "--environment_type=LOOPBACK"
+])
+with beam.Pipeline(options) as p:
+    ...
+```
+    
 #### Common Transforms
 
 #### Core Transforms
