@@ -348,3 +348,5 @@ Apache Beam is a unified model for defining both batch and streaming data-parall
 
 
 ### Certificación
+
+- [Beam quest](https://beam.apache.org/blog/beamquest)
